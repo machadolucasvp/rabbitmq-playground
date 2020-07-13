@@ -9,9 +9,9 @@ class Rabbit {
 
   #connection: any;
 
-  constructor() {
-    amqp.connect(Config.AMPQ_URI)
-      .then((connection) => this.#connection(connection));
+  async init() {
+    this.#connection = await amqp.connect(Config.AMPQ_URI);
+    return this.#connection;
   }
 
   async createChannel() {
@@ -20,7 +20,7 @@ class Rabbit {
     return this.#channel.prefetch(1);
   }
 
-  async createQueue(queues: any[]) {
+  async createQueues(queues: any[]) {
     return queues.map((queue: any) => this.#channel.assertQueue(queue));
   }
 
@@ -29,10 +29,10 @@ class Rabbit {
   }
 
   static buildPipeline(queues: any[]) {
-    return this.getInstance().createChannel()
+    return this.getInstance().init().then((connection) => connection.createChannel()
       .then((channel: any) => queues.forEach((queue) => {
         channel.assertQueue(queue);
-      }));
+      })));
   }
 
   static getInstance() {
@@ -44,3 +44,4 @@ class Rabbit {
 }
 
 export default Rabbit.getInstance;
+export { Rabbit };
