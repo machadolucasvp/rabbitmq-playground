@@ -29,10 +29,11 @@ class Rabbit {
   }
 
   static buildPipeline(queues: any[]) {
-    return this.getInstance().init().then((connection) => connection.createChannel()
-      .then((channel: any) => queues.forEach((queue) => {
-        channel.assertQueue(queue);
-      })));
+    return this.getInstance().init()
+      .then((connection) => connection.createChannel()
+        .then((channel: any) => queues.forEach((queue) => {
+          channel.assertQueue(queue);
+        })));
   }
 
   static getInstance() {
