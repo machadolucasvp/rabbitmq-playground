@@ -5,31 +5,31 @@ import Config from '../config';
 class Rabbit {
   static instance: Rabbit;
 
-  #connection: any;
-
   #channel: any;
+
+  #connection: any;
 
   constructor() {
     amqp.connect(Config.AMPQ_URI)
       .then((connection) => this.#connection(connection));
   }
 
-  createChannel() {
-    this.#channel = this.#connection.createChannel();
+  async createChannel() {
+    this.#channel = await this.#connection.createChannel();
 
-    return this.#channel;
+    return this.#channel.prefetch(1);
   }
 
-  createQueue(queues: any[]) {
+  async createQueue(queues: any[]) {
     return queues.map((queue: any) => this.#channel.assertQueue(queue));
   }
 
-  toQueue(queue: any, payload: any) {
+  async toQueue(queue: any, payload: any) {
     return this.#channel.sendToQueue(queue, Buffer.from(payload));
   }
 
   static buildPipeline(queues: any[]) {
-    this.getInstance().createChannel()
+    return this.getInstance().createChannel()
       .then((channel: any) => queues.forEach((queue) => {
         channel.assertQueue(queue);
       }));
