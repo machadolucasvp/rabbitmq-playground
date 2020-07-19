@@ -1,27 +1,18 @@
 import RabbitConnection, { Rabbit } from '../rabbit';
-import Config from '../../config';
 
-export class Publisher {
+class Publisher {
   rabbit: Rabbit = RabbitConnection();
 
-  constructor() {
-    this.init();
-  }
-
-  async init() {
+  async init(queues: string[]) {
     await this.rabbit.init();
 
     await this.rabbit.createChannel();
 
-    await this.rabbit.createQueues(Config.QUEUES);
+    await this.rabbit.createQueues(queues);
   }
 
-  async publish(queue: string, payload: any) {
-    try {
-      await this.rabbit.toQueue(queue, payload);
-    } catch (err) {
-      console.log('Publish failed');
-    }
+  async publish(queue: string, payload: any, options?: any) {
+    await this.rabbit.toQueue(queue, payload, options);
   }
 }
 

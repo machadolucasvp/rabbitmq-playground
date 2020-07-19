@@ -28,16 +28,8 @@ class Rabbit {
     return queues.map((queue: any) => this.#channel.assertQueue(queue));
   }
 
-  async toQueue(queue: any, payload: any) {
-    return this.#channel.sendToQueue(queue, Buffer.from(payload));
-  }
-
-  static buildPipeline(queues: any[]) {
-    return this.getInstance().init()
-      .then((connection) => connection.createChannel()
-        .then((channel: any) => queues.forEach((queue) => {
-          channel.assertQueue(queue);
-        })));
+  async toQueue(queue: any, payload: any, options?: any) {
+    return this.#channel.sendToQueue(queue, Buffer.from(JSON.stringify(payload)), options);
   }
 
   static getInstance() {
