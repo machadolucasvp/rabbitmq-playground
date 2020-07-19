@@ -3,24 +3,20 @@ import json from 'koa-json';
 import logger from 'koa-logger';
 
 import Config from './config';
+import Worker from './amqp/workers/worker';
+import Publisher from './amqp/publishers/publisher';
 
 const app = new Koa();
 
 app.use(json());
 app.use(logger());
 app.use(async (ctx, next) => {
-  const start = Date.now();
+  const { message } = ctx.body;
+  await Publisher.init();
+  Publisher.publish('pipeline', { message });
+  Worker.consume('pipeline');
+  console.log('hello world');
   await next();
-  const ms = Date.now() - start;
-  ctx.body = {
-    ...ctx.body,
-    requestTime: `${ms}ms`,
-  };
-  console.log(`${ctx.method} ${ctx.url} - ${ms}ms`);
-});
-
-app.use(async (ctx) => {
-  ctx.body = { message: 'hello world!' };
 });
 
 app.listen(Config.APP_PORT, () => {

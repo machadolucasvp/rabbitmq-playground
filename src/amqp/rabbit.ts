@@ -14,6 +14,10 @@ class Rabbit {
     return this.#connection;
   }
 
+  getChannel() {
+    return this.#channel;
+  }
+
   async createChannel() {
     this.#channel = await this.#connection.createChannel();
 
