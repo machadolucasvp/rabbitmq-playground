@@ -1,13 +1,13 @@
-import amqp from 'amqplib';
+import amqp, { Channel, Connection } from 'amqplib';
 
 import Config from '../config';
 
 class Rabbit {
   static instance: Rabbit;
 
-  #channel: any;
+  #channel?: Channel;
 
-  #connection: any;
+  #connection?: Connection;
 
   async init() {
     this.#connection = await amqp.connect(Config.AMPQ_URI);
@@ -19,17 +19,17 @@ class Rabbit {
   }
 
   async createChannel() {
-    this.#channel = await this.#connection.createChannel();
+    this.#channel = await this.#connection?.createChannel();
 
-    return this.#channel.prefetch(1);
+    return this.#channel?.prefetch(1);
   }
 
-  async createQueues(queues: any[]) {
-    return queues.map((queue: any) => this.#channel.assertQueue(queue));
+  async createQueues(queues: string[]) {
+    return queues.map((queue) => this.#channel?.assertQueue(queue));
   }
 
   async toQueue(queue: any, payload: any, options?: any) {
-    return this.#channel.sendToQueue(queue, Buffer.from(JSON.stringify(payload)), options);
+    return this.#channel?.sendToQueue(queue, Buffer.from(JSON.stringify(payload)), options);
   }
 
   static getInstance() {

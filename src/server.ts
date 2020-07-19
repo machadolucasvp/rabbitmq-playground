@@ -5,10 +5,12 @@ import logger from 'koa-logger';
 import Config from './config';
 
 import Publisher from './amqp/publishers/publisher';
+import Worker from './amqp/workers/worker';
 import timer from './middlewares/timer.middleware';
 
 const app = new Koa();
 Publisher.init(Config.QUEUES);
+Worker.init(Config.QUEUES);
 
 app.use(json());
 app.use(logger());

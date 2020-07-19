@@ -11,8 +11,8 @@ class Publisher {
     await this.rabbit.createQueues(queues);
   }
 
-  async publish(queue: string, payload: any, options?: any) {
-    await this.rabbit.toQueue(queue, payload, options);
+  async publish(queue: string, payload: any, options?: Object) {
+    return this.rabbit.toQueue(queue, payload, options);
   }
 }
 
